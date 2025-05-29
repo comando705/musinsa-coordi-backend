@@ -1,6 +1,5 @@
 package com.musinsacoordi.backend.config;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
@@ -16,7 +15,7 @@ public class WebConfig implements WebMvcConfigurer {
     /**
      * 뷰 컨트롤러 등록
      * URL 경로와 뷰 이름을 명시적으로 매핑합니다.
-     * 
+     *
      * @param registry ViewControllerRegistry 인스턴스
      */
     @Override
@@ -30,7 +29,7 @@ public class WebConfig implements WebMvcConfigurer {
     /**
      * 정적 리소스 핸들러 등록
      * CSS, JavaScript, 파비콘 등의 정적 리소스에 대한 경로를 매핑합니다.
-     * 
+     *
      * @param registry ResourceHandlerRegistry 인스턴스
      */
     @Override

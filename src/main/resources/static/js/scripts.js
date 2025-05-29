@@ -22,7 +22,7 @@ function showAlert(message, type = 'success') {
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     `;
     alertContainer.appendChild(alertDiv);
-    
+
     // Auto dismiss after 5 seconds
     setTimeout(() => {
         alertDiv.classList.remove('show');
@@ -44,26 +44,26 @@ function handleApiError(error) {
 // Generic function to make API requests
 async function apiRequest(url, method = 'GET', data = null) {
     showSpinner();
-    
+
     const options = {
         method: method,
         headers: {
             'Content-Type': 'application/json'
         }
     };
-    
+
     if (data && (method === 'POST' || method === 'PUT')) {
         options.body = JSON.stringify(data);
     }
-    
+
     try {
         const response = await fetch(url, options);
         const responseData = await response.json();
-        
+
         if (!response.ok) {
             throw { response: { data: responseData } };
         }
-        
+
         hideSpinner();
         return responseData;
     } catch (error) {

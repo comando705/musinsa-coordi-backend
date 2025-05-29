@@ -1,101 +1,74 @@
 package com.musinsacoordi.backend.domain.category;
 
-import com.musinsacoordi.backend.common.dto.ErrorResponseWrappers;
-import com.musinsacoordi.backend.domain.brand.dto.BrandResponseDto;
+import com.musinsacoordi.backend.common.dto.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.musinsacoordi.backend.common.dto.BaseResponse;
-import com.musinsacoordi.backend.common.dto.ResponseWrappers;
 import com.musinsacoordi.backend.domain.category.dto.CategoryRequestDto;
 import com.musinsacoordi.backend.domain.category.dto.CategoryResponseDto;
 
+import java.net.URI;
 import java.util.List;
 
+@Tag(name = "카테고리 API", description = "카테고리 관련 API")
 @RestController
-@RequestMapping("/api/categories")
+@RequestMapping("/api/v1/categories")
 @RequiredArgsConstructor
-@Tag(name = "Category", description = "카테고리 API")
 public class CategoryController {
 
     private final CategoryService categoryService;
 
     @Operation(summary = "카테고리 생성", description = "새로운 카테고리를 생성합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "카테고리 생성 성공",
-                    content = @Content(schema = @Schema(implementation = ResponseWrappers.CategoryResponseWrapper.class))),
-            @ApiResponse(responseCode = "409", description = "이미 존재하는 카테고리",
-                    content = @Content(schema = @Schema(implementation = ErrorResponseWrappers.ErrorResponseWrapper.class)))
-    })
     @PostMapping
     public ResponseEntity<BaseResponse<CategoryResponseDto>> createCategory(
-            @Valid @RequestBody CategoryRequestDto requestDto) {
+            @Parameter(description = "카테고리 생성 요청 정보", required = true)
+            @Valid @RequestBody CategoryRequestDto requestDto
+    ) {
         CategoryResponseDto responseDto = categoryService.createCategory(requestDto);
-        return ResponseEntity.status(HttpStatus.CREATED)
+        return ResponseEntity
+                .created(URI.create("/api/v1/categories/" + responseDto.getId()))
                 .body(BaseResponse.success(responseDto));
     }
 
-    @Operation(summary = "카테고리 전체 조회", description = "모든 카테고리를 조회합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "카테고리 조회 성공",
-                    content = @Content(schema = @Schema(implementation = ResponseWrappers.CategoryListResponseWrapper.class)))
-    })
+    @Operation(summary = "카테고리 목록 조회", description = "전체 카테고리 목록을 조회합니다.")
     @GetMapping
-    public ResponseEntity<BaseResponse<List<CategoryResponseDto>>> getAllCategories() {
-        List<CategoryResponseDto> responseDtoList = categoryService.getAllCategories();
+    public ResponseEntity<BaseResponse<List<CategoryResponseDto>>> getCategories() {
+        List<CategoryResponseDto> responseDtoList = categoryService.getCategories();
         return ResponseEntity.ok(BaseResponse.success(responseDtoList));
     }
 
-    @Operation(summary = "카테고리 단일 조회", description = "ID로 카테고리를 조회합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "카테고리 조회 성공",
-                    content = @Content(schema = @Schema(implementation = ResponseWrappers.CategoryResponseWrapper.class))),
-            @ApiResponse(responseCode = "404", description = "카테고리를 찾을 수 없음",
-                    content = @Content(schema = @Schema(implementation = ErrorResponseWrappers.ErrorResponseWrapper.class)))
-    })
+    @Operation(summary = "카테고리 단건 조회", description = "특정 카테고리를 조회합니다.")
     @GetMapping("/{id}")
-    public ResponseEntity<BaseResponse<CategoryResponseDto>> getCategoryById(
-            @Parameter(description = "카테고리 ID", required = true, example = "1")
-            @PathVariable Long id) {
-        CategoryResponseDto responseDto = categoryService.getCategoryById(id);
+    public ResponseEntity<BaseResponse<CategoryResponseDto>> getCategory(
+            @Parameter(description = "카테고리 ID", required = true)
+            @PathVariable Long id
+    ) {
+        CategoryResponseDto responseDto = categoryService.getCategory(id);
         return ResponseEntity.ok(BaseResponse.success(responseDto));
     }
 
-    @Operation(summary = "카테고리 수정", description = "ID로 카테고리를 수정합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "카테고리 수정 성공",
-                    content = @Content(schema = @Schema(implementation = ResponseWrappers.CategoryResponseWrapper.class))),
-            @ApiResponse(responseCode = "404", description = "카테고리를 찾을 수 없음",
-                    content = @Content(schema = @Schema(implementation = ErrorResponseWrappers.ErrorResponseWrapper.class)))
-    })
+    @Operation(summary = "카테고리 수정", description = "특정 카테고리의 정보를 수정합니다.")
     @PutMapping("/{id}")
     public ResponseEntity<BaseResponse<CategoryResponseDto>> updateCategory(
-            @Parameter(description = "카테고리 ID", required = true, example = "1")
+            @Parameter(description = "카테고리 ID", required = true)
             @PathVariable Long id,
-            @Valid @RequestBody CategoryRequestDto requestDto) {
+            @Parameter(description = "카테고리 수정 요청 정보", required = true)
+            @Valid @RequestBody CategoryRequestDto requestDto
+    ) {
         CategoryResponseDto responseDto = categoryService.updateCategory(id, requestDto);
         return ResponseEntity.ok(BaseResponse.success(responseDto));
     }
 
-    @Operation(summary = "카테고리 삭제", description = "ID로 카테고리를 삭제합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "카테고리 삭제 성공"),
-            @ApiResponse(responseCode = "404", description = "카테고리를 찾을 수 없음",
-                    content = @Content(schema = @Schema(implementation = ErrorResponseWrappers.ErrorResponseWrapper.class)))
-    })
+    @Operation(summary = "카테고리 삭제", description = "특정 카테고리를 삭제합니다.")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCategory(
-            @Parameter(description = "카테고리 ID", required = true, example = "1")
-            @PathVariable Long id) {
+            @Parameter(description = "카테고리 ID", required = true)
+            @PathVariable Long id
+    ) {
         categoryService.deleteCategory(id);
         return ResponseEntity.noContent().build();
     }

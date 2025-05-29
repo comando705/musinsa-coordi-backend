@@ -1,13 +1,12 @@
 package com.musinsacoordi.backend.domain.brand;
 
+import com.musinsacoordi.backend.common.entity.BaseTimeEntity;
+import com.musinsacoordi.backend.domain.product.Product;
 import jakarta.persistence.*;
-import jakarta.persistence.CascadeType;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import com.musinsacoordi.backend.common.entity.BaseTimeEntity;
-import com.musinsacoordi.backend.domain.product.Product;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,10 +23,11 @@ public class Brand extends BaseTimeEntity {
     private String name;
 
     @OneToMany(mappedBy = "brand", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Product> products = new ArrayList<>();
+    private final List<Product> products = new ArrayList<>();
 
     @Builder
-    public Brand(String name) {
+    public Brand(Long id, String name) {
+        this.id = id;
         this.name = name;
     }
 

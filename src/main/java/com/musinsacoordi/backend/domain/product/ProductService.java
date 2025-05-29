@@ -1,72 +1,61 @@
 package com.musinsacoordi.backend.domain.product;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import com.musinsacoordi.backend.common.error.BaseException;
-import com.musinsacoordi.backend.common.error.ErrorCode;
 import com.musinsacoordi.backend.domain.brand.Brand;
 import com.musinsacoordi.backend.domain.brand.BrandRepository;
 import com.musinsacoordi.backend.domain.category.Category;
 import com.musinsacoordi.backend.domain.category.CategoryRepository;
 import com.musinsacoordi.backend.domain.product.dto.ProductRequestDto;
 import com.musinsacoordi.backend.domain.product.dto.ProductResponseDto;
+import com.musinsacoordi.backend.domain.product.error.ProductErrorCode;
+import com.musinsacoordi.backend.domain.product.error.ProductException;
+import com.musinsacoordi.backend.domain.product.validation.ProductValidator;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ProductService {
-
     private final ProductRepository productRepository;
     private final BrandRepository brandRepository;
     private final CategoryRepository categoryRepository;
+    private final ProductValidator productValidator;
 
-    /**
-     * 상품 생성
-     */
     @Transactional
     public ProductResponseDto createProduct(ProductRequestDto requestDto) {
-        // 브랜드 조회
+        // 비즈니스 규칙 검증
+        productValidator.validateCreate(requestDto);
+
+        // 연관 엔티티 조회
         Brand brand = brandRepository.findById(requestDto.getBrandId())
-                .orElseThrow(() -> new BaseException(ErrorCode.ENTITY_NOT_FOUND, "브랜드", requestDto.getBrandId()));
-        
-        // 카테고리 조회
+                .orElseThrow(() -> new ProductException(ProductErrorCode.INVALID_PRODUCT_INFO, "존재하지 않는 브랜드"));
+
         Category category = categoryRepository.findById(requestDto.getCategoryId())
-                .orElseThrow(() -> new BaseException(ErrorCode.ENTITY_NOT_FOUND, "카테고리", requestDto.getCategoryId()));
-        
-        // 브랜드와 카테고리 조합 중복 검사
-        if (productRepository.findByBrandAndCategory(brand, category).isPresent()) {
-            throw new BaseException(ErrorCode.ALREADY_EXIST_ENTITY, "상품", brand.getName() + "-" + category.getName());
-        }
-        
+                .orElseThrow(() -> new ProductException(ProductErrorCode.INVALID_PRODUCT_INFO, "존재하지 않는 카테고리"));
+
+        // 엔티티 생성 및 저장
         Product product = Product.builder()
                 .brand(brand)
                 .category(category)
                 .price(requestDto.getPrice())
                 .build();
-        
+
         Product savedProduct = productRepository.save(product);
         return ProductResponseDto.of(savedProduct);
     }
 
-    /**
-     * 상품 전체 조회
-     */
     public List<ProductResponseDto> getAllProducts() {
         return productRepository.findAll().stream()
                 .map(ProductResponseDto::of)
-                .collect(Collectors.toList());
+                .toList();
     }
 
-    /**
-     * 상품 단일 조회
-     */
     public ProductResponseDto getProductById(Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new BaseException(ErrorCode.ENTITY_NOT_FOUND, "상품", id));
+                .orElseThrow(() -> new ProductException(ProductErrorCode.PRODUCT_NOT_FOUND, id));
         return ProductResponseDto.of(product);
     }
 
@@ -75,11 +64,11 @@ public class ProductService {
      */
     public List<ProductResponseDto> getProductsByBrandId(Long brandId) {
         Brand brand = brandRepository.findById(brandId)
-                .orElseThrow(() -> new BaseException(ErrorCode.ENTITY_NOT_FOUND, "브랜드", brandId));
-        
+                .orElseThrow(() -> new ProductException(ProductErrorCode.INVALID_PRODUCT_INFO, "존재하지 않는 브랜드"));
+
         return productRepository.findByBrand(brand).stream()
                 .map(ProductResponseDto::of)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -87,32 +76,38 @@ public class ProductService {
      */
     public List<ProductResponseDto> getProductsByCategoryId(Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new BaseException(ErrorCode.ENTITY_NOT_FOUND, "카테고리", categoryId));
-        
+                .orElseThrow(() -> new ProductException(ProductErrorCode.INVALID_PRODUCT_INFO, "존재하지 않는 카테고리"));
+
         return productRepository.findByCategory(category).stream()
                 .map(ProductResponseDto::of)
-                .collect(Collectors.toList());
+                .toList();
     }
 
-    /**
-     * 상품 가격 수정
-     */
     @Transactional
-    public ProductResponseDto updateProductPrice(Long id, ProductRequestDto requestDto) {
+    public ProductResponseDto updateProduct(Long id, ProductRequestDto requestDto) {
+        // 비즈니스 규칙 검증
+        productValidator.validateUpdate(id, requestDto);
+
+        // 엔티티 조회
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new BaseException(ErrorCode.ENTITY_NOT_FOUND, "상품", id));
-        
-        product.updatePrice(requestDto.getPrice());
+                .orElseThrow(() -> new ProductException(ProductErrorCode.PRODUCT_NOT_FOUND, id));
+
+        // 연관 엔티티 조회
+        Brand brand = brandRepository.findById(requestDto.getBrandId())
+                .orElseThrow(() -> new ProductException(ProductErrorCode.INVALID_PRODUCT_INFO, "존재하지 않는 브랜드"));
+
+        Category category = categoryRepository.findById(requestDto.getCategoryId())
+                .orElseThrow(() -> new ProductException(ProductErrorCode.INVALID_PRODUCT_INFO, "존재하지 않는 카테고리"));
+
+        // 엔티티 수정
+        product.update(brand, category, requestDto.getPrice());
         return ProductResponseDto.of(product);
     }
 
-    /**
-     * 상품 삭제
-     */
     @Transactional
     public void deleteProduct(Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new BaseException(ErrorCode.ENTITY_NOT_FOUND, "상품", id));
+                .orElseThrow(() -> new ProductException(ProductErrorCode.PRODUCT_NOT_FOUND, id));
         productRepository.delete(product);
     }
 }

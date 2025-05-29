@@ -1,6 +1,10 @@
 package com.musinsacoordi.backend.domain.product;
 
+import com.musinsacoordi.backend.common.dto.BaseResponse;
 import com.musinsacoordi.backend.common.dto.ErrorResponseWrappers;
+import com.musinsacoordi.backend.common.dto.ResponseWrappers;
+import com.musinsacoordi.backend.domain.product.dto.ProductRequestDto;
+import com.musinsacoordi.backend.domain.product.dto.ProductResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -13,10 +17,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.musinsacoordi.backend.common.dto.BaseResponse;
-import com.musinsacoordi.backend.common.dto.ResponseWrappers;
-import com.musinsacoordi.backend.domain.product.dto.ProductRequestDto;
-import com.musinsacoordi.backend.domain.product.dto.ProductResponseDto;
 
 import java.util.List;
 
@@ -99,21 +99,23 @@ public class ProductController {
         return ResponseEntity.ok(BaseResponse.success(responseDtoList));
     }
 
-    @Operation(summary = "상품 가격 수정", description = "ID로 상품 가격을 수정합니다.")
+    @Operation(summary = "상품 수정", description = "상품 정보를 수정합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "상품 수정 성공",
                     content = @Content(schema = @Schema(implementation = ResponseWrappers.ProductResponseWrapper.class))),
             @ApiResponse(responseCode = "400", description = "잘못된 요청",
                     content = @Content(schema = @Schema(implementation = ErrorResponseWrappers.ErrorResponseWrapper.class))),
             @ApiResponse(responseCode = "404", description = "상품을 찾을 수 없음",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseWrappers.ErrorResponseWrapper.class))),
+            @ApiResponse(responseCode = "409", description = "이미 존재하는 상품",
                     content = @Content(schema = @Schema(implementation = ErrorResponseWrappers.ErrorResponseWrapper.class)))
     })
     @PutMapping("/{id}")
-    public ResponseEntity<BaseResponse<ProductResponseDto>> updateProductPrice(
+    public ResponseEntity<BaseResponse<ProductResponseDto>> updateProduct(
             @Parameter(description = "상품 ID", required = true, example = "1")
             @PathVariable Long id,
-            @Valid @RequestBody ProductRequestDto requestDto) {
-        ProductResponseDto responseDto = productService.updateProductPrice(id, requestDto);
+            @RequestBody @Valid ProductRequestDto requestDto) {
+        ProductResponseDto responseDto = productService.updateProduct(id, requestDto);
         return ResponseEntity.ok(BaseResponse.success(responseDto));
     }
 

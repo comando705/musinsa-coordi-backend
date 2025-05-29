@@ -2,11 +2,7 @@ package com.musinsacoordi.backend.common.dto;
 
 import com.musinsacoordi.backend.domain.brand.dto.BrandResponseDto;
 import com.musinsacoordi.backend.domain.category.dto.CategoryResponseDto;
-import com.musinsacoordi.backend.domain.product.dto.BrandLowestTotalPriceDto;
-import com.musinsacoordi.backend.domain.product.dto.CategoryPriceMinMaxDto;
-import com.musinsacoordi.backend.domain.product.dto.CategoryPriceMinMaxKoDto;
-import com.musinsacoordi.backend.domain.product.dto.CategoryPriceRangeDto;
-import com.musinsacoordi.backend.domain.product.dto.ProductResponseDto;
+import com.musinsacoordi.backend.domain.product.dto.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;

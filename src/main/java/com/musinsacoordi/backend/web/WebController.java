@@ -13,6 +13,7 @@ public class WebController {
 
     /**
      * 홈 페이지 (기본 리다이렉트)
+     *
      * @return 브랜드 관리 페이지로 리다이렉트
      */
     @GetMapping("/")

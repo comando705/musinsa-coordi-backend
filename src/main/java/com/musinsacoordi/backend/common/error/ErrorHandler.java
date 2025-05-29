@@ -31,7 +31,7 @@ public class ErrorHandler {
         log.error("BaseException", e);
         ErrorCode errorCode = e.getErrorCode();
         String message = e.getMessage();
-        
+
         BaseResponse<Object> response = BaseResponse.error(errorCode, message);
         return ResponseEntity.status(errorCode.getHttpStatus()).body(response);
     }
@@ -45,9 +45,9 @@ public class ErrorHandler {
         log.error("MissingServletRequestParameterException", e);
         String message = String.format("필수 파라미터가 누락되었습니다. 파라미터명: %s, 타입: %s",
                 e.getParameterName(), e.getParameterType());
-        
-        BaseResponse<Object> response = BaseResponse.error(ErrorCode.BAD_REQUEST, message);
-        return ResponseEntity.status(ErrorCode.BAD_REQUEST.getHttpStatus()).body(response);
+
+        BaseResponse<Object> response = BaseResponse.error(CommonErrorCode.BAD_REQUEST, message);
+        return ResponseEntity.status(CommonErrorCode.BAD_REQUEST.getHttpStatus()).body(response);
     }
 
     /**
@@ -58,10 +58,10 @@ public class ErrorHandler {
             HttpMessageNotReadableException e) {
         log.error("HttpMessageNotReadableException", e);
         BaseResponse<Object> response = BaseResponse.error(
-            ErrorCode.BAD_REQUEST, 
+            CommonErrorCode.BAD_REQUEST,
             "JSON 파싱에 실패했습니다. 요청 본문을 확인해주세요."
         );
-        return ResponseEntity.status(ErrorCode.BAD_REQUEST.getHttpStatus()).body(response);
+        return ResponseEntity.status(CommonErrorCode.BAD_REQUEST.getHttpStatus()).body(response);
     }
 
     /**
@@ -72,10 +72,10 @@ public class ErrorHandler {
             HttpRequestMethodNotSupportedException e) {
         log.error("HttpRequestMethodNotSupportedException", e);
         BaseResponse<Object> response = BaseResponse.error(
-            ErrorCode.METHOD_NOT_ALLOWED,
+            CommonErrorCode.METHOD_NOT_ALLOWED,
             String.format("지원하지 않는 HTTP Method입니다. 요청: %s", e.getMethod())
         );
-        return ResponseEntity.status(ErrorCode.METHOD_NOT_ALLOWED.getHttpStatus()).body(response);
+        return ResponseEntity.status(CommonErrorCode.METHOD_NOT_ALLOWED.getHttpStatus()).body(response);
     }
 
     /**
@@ -86,10 +86,10 @@ public class ErrorHandler {
             DataIntegrityViolationException e) {
         log.error("DataIntegrityViolationException", e);
         BaseResponse<Object> response = BaseResponse.error(
-            ErrorCode.ALREADY_EXIST_ENTITY,
+            CommonErrorCode.ALREADY_EXIST_ENTITY,
             "데이터 무결성 제약조건을 위반했습니다."
         );
-        return ResponseEntity.status(ErrorCode.ALREADY_EXIST_ENTITY.getHttpStatus()).body(response);
+        return ResponseEntity.status(CommonErrorCode.ALREADY_EXIST_ENTITY.getHttpStatus()).body(response);
     }
 
     /**
@@ -98,7 +98,7 @@ public class ErrorHandler {
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<BaseResponse<Object>> handleException(Exception e) {
         log.error("Exception", e);
-        BaseResponse<Object> response = BaseResponse.error(ErrorCode.INTERNAL_SERVER_ERROR);
-        return ResponseEntity.status(ErrorCode.INTERNAL_SERVER_ERROR.getHttpStatus()).body(response);
+        BaseResponse<Object> response = BaseResponse.error(CommonErrorCode.INTERNAL_SERVER_ERROR);
+        return ResponseEntity.status(CommonErrorCode.INTERNAL_SERVER_ERROR.getHttpStatus()).body(response);
     }
 }

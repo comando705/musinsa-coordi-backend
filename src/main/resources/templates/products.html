@@ -1,296 +1,300 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" 
-      th:replace="~{layout :: html(~{::title}, ~{::section})}">
+<html th:replace="~{layout :: html(~{::title}, ~{::section})}"
+      xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>상품 관리 - 무신사 코디 관리자</title>
 </head>
 <body>
-    <section th:fragment="content">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>상품 관리</h2>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createProductModal">
-                <i class="bi bi-plus-circle"></i> 상품 등록
-            </button>
+<section th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>상품 관리</h2>
+        <button class="btn btn-primary" data-bs-target="#createProductModal" data-bs-toggle="modal" type="button">
+            <i class="bi bi-plus-circle"></i> 상품 등록
+        </button>
+    </div>
+
+    <!-- Alert Container -->
+    <div id="alertContainer"></div>
+
+    <!-- Loading Spinner -->
+    <div class="spinner-container">
+        <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">Loading...</span>
         </div>
+    </div>
 
-        <!-- Alert Container -->
-        <div id="alertContainer"></div>
-
-        <!-- Loading Spinner -->
-        <div class="spinner-container">
-            <div class="spinner-border text-light" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
+    <!-- Filter Controls -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="bi bi-funnel"></i> 필터
         </div>
-
-        <!-- Filter Controls -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <i class="bi bi-funnel"></i> 필터
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label for="brandFilter" class="form-label">브랜드</label>
-                        <select class="form-select" id="brandFilter">
-                            <option value="">전체 브랜드</option>
-                            <!-- Options will be populated by JavaScript -->
-                        </select>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="categoryFilter" class="form-label">카테고리</label>
-                        <select class="form-select" id="categoryFilter">
-                            <option value="">전체 카테고리</option>
-                            <!-- Options will be populated by JavaScript -->
-                        </select>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="priceFilter" class="form-label">가격 정렬</label>
-                        <select class="form-select" id="priceFilter">
-                            <option value="">기본 정렬</option>
-                            <option value="asc">낮은 가격순</option>
-                            <option value="desc">높은 가격순</option>
-                        </select>
-                    </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label" for="brandFilter">브랜드</label>
+                    <select class="form-select" id="brandFilter">
+                        <option value="">전체 브랜드</option>
+                        <!-- Options will be populated by JavaScript -->
+                    </select>
                 </div>
-                <div class="text-end">
-                    <button class="btn btn-primary" id="applyFilterButton">
-                        <i class="bi bi-search"></i> 적용
-                    </button>
-                    <button class="btn btn-secondary" id="resetFilterButton">
-                        <i class="bi bi-arrow-counterclockwise"></i> 초기화
-                    </button>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label" for="categoryFilter">카테고리</label>
+                    <select class="form-select" id="categoryFilter">
+                        <option value="">전체 카테고리</option>
+                        <!-- Options will be populated by JavaScript -->
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label" for="priceFilter">가격 정렬</label>
+                    <select class="form-select" id="priceFilter">
+                        <option value="">기본 정렬</option>
+                        <option value="asc">낮은 가격순</option>
+                        <option value="desc">높은 가격순</option>
+                    </select>
                 </div>
             </div>
-        </div>
-
-        <!-- Products Table -->
-        <div class="table-container">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>브랜드</th>
-                        <th>카테고리</th>
-                        <th>가격</th>
-                        <th>관리</th>
-                    </tr>
-                </thead>
-                <tbody id="productTableBody">
-                    <!-- Table rows will be populated by JavaScript -->
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Create Product Modal -->
-        <div class="modal fade" id="createProductModal" tabindex="-1" aria-labelledby="createProductModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="createProductModalLabel">상품 등록</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="createProductForm">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="createProductPrice" class="form-label required-field">가격</label>
-                                    <input type="number" class="form-control" id="createProductPrice" name="price" min="0" required>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="createProductBrandId" class="form-label required-field">브랜드</label>
-                                    <select class="form-select" id="createProductBrandId" name="brandId" required>
-                                        <option value="">브랜드 선택</option>
-                                        <!-- Options will be populated by JavaScript -->
-                                    </select>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="createProductCategoryId" class="form-label required-field">카테고리</label>
-                                    <select class="form-select" id="createProductCategoryId" name="categoryId" required>
-                                        <option value="">카테고리 선택</option>
-                                        <!-- Options will be populated by JavaScript -->
-                                    </select>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                        <button type="button" class="btn btn-primary" id="createProductButton">등록</button>
-                    </div>
-                </div>
+            <div class="text-end">
+                <button class="btn btn-primary" id="applyFilterButton">
+                    <i class="bi bi-search"></i> 적용
+                </button>
+                <button class="btn btn-secondary" id="resetFilterButton">
+                    <i class="bi bi-arrow-counterclockwise"></i> 초기화
+                </button>
             </div>
         </div>
+    </div>
 
-        <!-- Edit Product Modal -->
-        <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editProductModalLabel">상품 수정</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="editProductForm">
-                            <input type="hidden" id="editProductId">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="editProductPrice" class="form-label required-field">가격</label>
-                                    <input type="number" class="form-control" id="editProductPrice" name="price" min="0" required>
-                                </div>
+    <!-- Products Table -->
+    <div class="table-container">
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>브랜드</th>
+                <th>카테고리</th>
+                <th>가격</th>
+                <th>관리</th>
+            </tr>
+            </thead>
+            <tbody id="productTableBody">
+            <!-- Table rows will be populated by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Create Product Modal -->
+    <div aria-hidden="true" aria-labelledby="createProductModalLabel" class="modal fade" id="createProductModal"
+         tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createProductModalLabel">상품 등록</h5>
+                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createProductForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label required-field" for="createProductPrice">가격</label>
+                                <input class="form-control" id="createProductPrice" min="0" name="price" required
+                                       type="number">
                             </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="editProductBrandId" class="form-label required-field">브랜드</label>
-                                    <select class="form-select" id="editProductBrandId" name="brandId" required>
-                                        <option value="">브랜드 선택</option>
-                                        <!-- Options will be populated by JavaScript -->
-                                    </select>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="editProductCategoryId" class="form-label required-field">카테고리</label>
-                                    <select class="form-select" id="editProductCategoryId" name="categoryId" required>
-                                        <option value="">카테고리 선택</option>
-                                        <!-- Options will be populated by JavaScript -->
-                                    </select>
-                                </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label required-field" for="createProductBrandId">브랜드</label>
+                                <select class="form-select" id="createProductBrandId" name="brandId" required>
+                                    <option value="">브랜드 선택</option>
+                                    <!-- Options will be populated by JavaScript -->
+                                </select>
                             </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                        <button type="button" class="btn btn-primary" id="updateProductButton">저장</button>
-                    </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label required-field" for="createProductCategoryId">카테고리</label>
+                                <select class="form-select" id="createProductCategoryId" name="categoryId" required>
+                                    <option value="">카테고리 선택</option>
+                                    <!-- Options will be populated by JavaScript -->
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">취소</button>
+                    <button class="btn btn-primary" id="createProductButton" type="button">등록</button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Product-specific JavaScript -->
-        <script th:inline="javascript">
-            document.addEventListener('DOMContentLoaded', function() {
-                // Load initial data
-                loadBrands();
-                loadCategories();
-                loadProducts();
-                
-                // Create product button click handler
-                document.getElementById('createProductButton').addEventListener('click', createProduct);
-                
-                // Update product button click handler
-                document.getElementById('updateProductButton').addEventListener('click', updateProduct);
-                
-                // Filter button click handlers
-                document.getElementById('applyFilterButton').addEventListener('click', applyFilters);
-                document.getElementById('resetFilterButton').addEventListener('click', resetFilters);
+    <!-- Edit Product Modal -->
+    <div aria-hidden="true" aria-labelledby="editProductModalLabel" class="modal fade" id="editProductModal"
+         tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProductModalLabel">상품 수정</h5>
+                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editProductForm">
+                        <input id="editProductId" type="hidden">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label required-field" for="editProductPrice">가격</label>
+                                <input class="form-control" id="editProductPrice" min="0" name="price" required
+                                       type="number">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label required-field" for="editProductBrandId">브랜드</label>
+                                <select class="form-select" id="editProductBrandId" name="brandId" required>
+                                    <option value="">브랜드 선택</option>
+                                    <!-- Options will be populated by JavaScript -->
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label required-field" for="editProductCategoryId">카테고리</label>
+                                <select class="form-select" id="editProductCategoryId" name="categoryId" required>
+                                    <option value="">카테고리 선택</option>
+                                    <!-- Options will be populated by JavaScript -->
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">취소</button>
+                    <button class="btn btn-primary" id="updateProductButton" type="button">저장</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product-specific JavaScript -->
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            // Load initial data
+            loadBrands();
+            loadCategories();
+            loadProducts();
+
+            // Create product button click handler
+            document.getElementById('createProductButton').addEventListener('click', createProduct);
+
+            // Update product button click handler
+            document.getElementById('updateProductButton').addEventListener('click', updateProduct);
+
+            // Filter button click handlers
+            document.getElementById('applyFilterButton').addEventListener('click', applyFilters);
+            document.getElementById('resetFilterButton').addEventListener('click', resetFilters);
+        });
+
+        // Load all products
+        async function loadProducts(brandId = null, categoryId = null) {
+            try {
+                let url = '/api/products';
+
+                if (brandId) {
+                    url = `/api/products/brand/${brandId}`;
+                } else if (categoryId) {
+                    url = `/api/products/category/${categoryId}`;
+                }
+
+                const response = await apiRequest(url);
+                if (response && response.data) {
+                    displayProducts(response.data);
+                }
+            } catch (error) {
+                console.error('Failed to load products:', error);
+            }
+        }
+
+        // Load all brands for dropdowns
+        async function loadBrands() {
+            try {
+                const response = await apiRequest('/api/brands');
+                if (response && response.data) {
+                    populateBrandDropdowns(response.data);
+                }
+            } catch (error) {
+                console.error('Failed to load brands:', error);
+            }
+        }
+
+        // Load all categories for dropdowns
+        async function loadCategories() {
+            try {
+                const response = await apiRequest('/api/categories');
+                if (response && response.data) {
+                    populateCategoryDropdowns(response.data);
+                }
+            } catch (error) {
+                console.error('Failed to load categories:', error);
+            }
+        }
+
+        // Populate brand dropdowns
+        function populateBrandDropdowns(brands) {
+            const createDropdown = document.getElementById('createProductBrandId');
+            const editDropdown = document.getElementById('editProductBrandId');
+            const filterDropdown = document.getElementById('brandFilter');
+
+            // Clear existing options except the first one
+            createDropdown.innerHTML = '<option value="">브랜드 선택</option>';
+            editDropdown.innerHTML = '<option value="">브랜드 선택</option>';
+            filterDropdown.innerHTML = '<option value="">전체 브랜드</option>';
+
+            brands.forEach(brand => {
+                const option = `<option value="${brand.id}">${brand.name}</option>`;
+                createDropdown.innerHTML += option;
+                editDropdown.innerHTML += option;
+                filterDropdown.innerHTML += option;
             });
-            
-            // Load all products
-            async function loadProducts(brandId = null, categoryId = null) {
-                try {
-                    let url = '/api/products';
-                    
-                    if (brandId) {
-                        url = `/api/products/brand/${brandId}`;
-                    } else if (categoryId) {
-                        url = `/api/products/category/${categoryId}`;
-                    }
-                    
-                    const response = await apiRequest(url);
-                    if (response && response.data) {
-                        displayProducts(response.data);
-                    }
-                } catch (error) {
-                    console.error('Failed to load products:', error);
-                }
+        }
+
+        // Populate category dropdowns
+        function populateCategoryDropdowns(categories) {
+            const createDropdown = document.getElementById('createProductCategoryId');
+            const editDropdown = document.getElementById('editProductCategoryId');
+            const filterDropdown = document.getElementById('categoryFilter');
+
+            // Clear existing options except the first one
+            createDropdown.innerHTML = '<option value="">카테고리 선택</option>';
+            editDropdown.innerHTML = '<option value="">카테고리 선택</option>';
+            filterDropdown.innerHTML = '<option value="">전체 카테고리</option>';
+
+            categories.forEach(category => {
+                const option = `<option value="${category.id}">${category.name}</option>`;
+                createDropdown.innerHTML += option;
+                editDropdown.innerHTML += option;
+                filterDropdown.innerHTML += option;
+            });
+        }
+
+        // Display products in the table
+        function displayProducts(products) {
+            const tableBody = document.getElementById('productTableBody');
+            tableBody.innerHTML = '';
+
+            if (products.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="6" class="text-center">등록된 상품이 없습니다.</td>';
+                tableBody.appendChild(row);
+                return;
             }
-            
-            // Load all brands for dropdowns
-            async function loadBrands() {
-                try {
-                    const response = await apiRequest('/api/brands');
-                    if (response && response.data) {
-                        populateBrandDropdowns(response.data);
-                    }
-                } catch (error) {
-                    console.error('Failed to load brands:', error);
-                }
-            }
-            
-            // Load all categories for dropdowns
-            async function loadCategories() {
-                try {
-                    const response = await apiRequest('/api/categories');
-                    if (response && response.data) {
-                        populateCategoryDropdowns(response.data);
-                    }
-                } catch (error) {
-                    console.error('Failed to load categories:', error);
-                }
-            }
-            
-            // Populate brand dropdowns
-            function populateBrandDropdowns(brands) {
-                const createDropdown = document.getElementById('createProductBrandId');
-                const editDropdown = document.getElementById('editProductBrandId');
-                const filterDropdown = document.getElementById('brandFilter');
-                
-                // Clear existing options except the first one
-                createDropdown.innerHTML = '<option value="">브랜드 선택</option>';
-                editDropdown.innerHTML = '<option value="">브랜드 선택</option>';
-                filterDropdown.innerHTML = '<option value="">전체 브랜드</option>';
-                
-                brands.forEach(brand => {
-                    const option = `<option value="${brand.id}">${brand.name}</option>`;
-                    createDropdown.innerHTML += option;
-                    editDropdown.innerHTML += option;
-                    filterDropdown.innerHTML += option;
+
+            // Sort products if price filter is applied
+            const priceFilter = document.getElementById('priceFilter').value;
+            if (priceFilter) {
+                products.sort((a, b) => {
+                    return priceFilter === 'asc' ? a.price - b.price : b.price - a.price;
                 });
             }
-            
-            // Populate category dropdowns
-            function populateCategoryDropdowns(categories) {
-                const createDropdown = document.getElementById('createProductCategoryId');
-                const editDropdown = document.getElementById('editProductCategoryId');
-                const filterDropdown = document.getElementById('categoryFilter');
-                
-                // Clear existing options except the first one
-                createDropdown.innerHTML = '<option value="">카테고리 선택</option>';
-                editDropdown.innerHTML = '<option value="">카테고리 선택</option>';
-                filterDropdown.innerHTML = '<option value="">전체 카테고리</option>';
-                
-                categories.forEach(category => {
-                    const option = `<option value="${category.id}">${category.name}</option>`;
-                    createDropdown.innerHTML += option;
-                    editDropdown.innerHTML += option;
-                    filterDropdown.innerHTML += option;
-                });
-            }
-            
-            // Display products in the table
-            function displayProducts(products) {
-                const tableBody = document.getElementById('productTableBody');
-                tableBody.innerHTML = '';
-                
-                if (products.length === 0) {
-                    const row = document.createElement('tr');
-                    row.innerHTML = '<td colspan="6" class="text-center">등록된 상품이 없습니다.</td>';
-                    tableBody.appendChild(row);
-                    return;
-                }
-                
-                // Sort products if price filter is applied
-                const priceFilter = document.getElementById('priceFilter').value;
-                if (priceFilter) {
-                    products.sort((a, b) => {
-                        return priceFilter === 'asc' ? a.price - b.price : b.price - a.price;
-                    });
-                }
-                
-                products.forEach(product => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
+
+            products.forEach(product => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
                         <td>${product.id}</td>
                         <td>${product.brandName}</td>
                         <td>${product.categoryName}</td>
@@ -304,123 +308,123 @@
                             </button>
                         </td>
                     `;
-                    tableBody.appendChild(row);
-                });
-            }
-            
-            // Apply filters
-            function applyFilters() {
-                const brandId = document.getElementById('brandFilter').value;
-                const categoryId = document.getElementById('categoryFilter').value;
-                
-                if (brandId) {
-                    loadProducts(brandId, null);
-                } else if (categoryId) {
-                    loadProducts(null, categoryId);
-                } else {
-                    loadProducts();
-                }
-            }
-            
-            // Reset filters
-            function resetFilters() {
-                document.getElementById('brandFilter').value = '';
-                document.getElementById('categoryFilter').value = '';
-                document.getElementById('priceFilter').value = '';
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const brandId = document.getElementById('brandFilter').value;
+            const categoryId = document.getElementById('categoryFilter').value;
+
+            if (brandId) {
+                loadProducts(brandId, null);
+            } else if (categoryId) {
+                loadProducts(null, categoryId);
+            } else {
                 loadProducts();
             }
-            
-            // Create a new product
-            async function createProduct() {
-                const form = document.getElementById('createProductForm');
-                
-                if (!form.checkValidity()) {
-                    form.reportValidity();
-                    return;
-                }
-                
-                const productData = {
-                    price: parseInt(document.getElementById('createProductPrice').value),
-                    brandId: parseInt(document.getElementById('createProductBrandId').value),
-                    brand: parseInt(document.getElementById('createProductBrandId').value),
-                    categoryId: parseInt(document.getElementById('createProductCategoryId').value),
-                };
-                
-                try {
-                    const response = await apiRequest('/api/products', 'POST', productData);
-                    if (response && response.data) {
-                        showAlert('상품이 성공적으로 등록되었습니다.');
-                        loadProducts();
-                        $('#createProductModal').modal('hide');
-                    }
-                } catch (error) {
-                    console.error('Failed to create product:', error);
-                }
-            }
-            
-            // Open edit product modal with product data
-            async function openEditProductModal(id) {
-                try {
-                    const response = await apiRequest(`/api/products/${id}`);
-                    if (response && response.data) {
-                        const product = response.data;
-                        
-                        document.getElementById('editProductId').value = product.id;
-                        document.getElementById('editProductPrice').value = product.price;
-                        document.getElementById('editProductBrandId').value = product.brandId;
-                        document.getElementById('editProductCategoryId').value = product.categoryId;
+        }
 
-                        const editModal = new bootstrap.Modal(document.getElementById('editProductModal'));
-                        editModal.show();
-                    }
-                } catch (error) {
-                    console.error('Failed to load product details:', error);
-                }
+        // Reset filters
+        function resetFilters() {
+            document.getElementById('brandFilter').value = '';
+            document.getElementById('categoryFilter').value = '';
+            document.getElementById('priceFilter').value = '';
+            loadProducts();
+        }
+
+        // Create a new product
+        async function createProduct() {
+            const form = document.getElementById('createProductForm');
+
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
             }
-            
-            // Update an existing product
-            async function updateProduct() {
-                const form = document.getElementById('editProductForm');
-                
-                if (!form.checkValidity()) {
-                    form.reportValidity();
-                    return;
-                }
-                
-                const productId = document.getElementById('editProductId').value;
-                const productData = {
-                    price: parseInt(document.getElementById('editProductPrice').value),
-                    brandId: parseInt(document.getElementById('editProductBrandId').value),
-                    categoryId: parseInt(document.getElementById('editProductCategoryId').value),
-                };
-                
-                try {
-                    const response = await apiRequest(`/api/products/${productId}`, 'PUT', productData);
-                    if (response && response.data) {
-                        showAlert('상품이 성공적으로 수정되었습니다.');
-                        loadProducts();
-                        $('#editProductModal').modal('hide');
-                    }
-                } catch (error) {
-                    console.error('Failed to update product:', error);
-                }
-            }
-            
-            // Delete a product
-            async function deleteProduct(id) {
-                if (!confirm('정말로 이 상품을 삭제하시겠습니까?')) {
-                    return;
-                }
-                
-                try {
-                    await apiRequest(`/api/products/${id}`, 'DELETE');
-                    showAlert('상품이 성공적으로 삭제되었습니다.');
+
+            const productData = {
+                price: parseInt(document.getElementById('createProductPrice').value),
+                brandId: parseInt(document.getElementById('createProductBrandId').value),
+                brand: parseInt(document.getElementById('createProductBrandId').value),
+                categoryId: parseInt(document.getElementById('createProductCategoryId').value),
+            };
+
+            try {
+                const response = await apiRequest('/api/products', 'POST', productData);
+                if (response && response.data) {
+                    showAlert('상품이 성공적으로 등록되었습니다.');
                     loadProducts();
-                } catch (error) {
-                    console.error('Failed to delete product:', error);
+                    $('#createProductModal').modal('hide');
                 }
+            } catch (error) {
+                console.error('Failed to create product:', error);
             }
-        </script>
-    </section>
+        }
+
+        // Open edit product modal with product data
+        async function openEditProductModal(id) {
+            try {
+                const response = await apiRequest(`/api/products/${id}`);
+                if (response && response.data) {
+                    const product = response.data;
+
+                    document.getElementById('editProductId').value = product.id;
+                    document.getElementById('editProductPrice').value = product.price;
+                    document.getElementById('editProductBrandId').value = product.brandId;
+                    document.getElementById('editProductCategoryId').value = product.categoryId;
+
+                    const editModal = new bootstrap.Modal(document.getElementById('editProductModal'));
+                    editModal.show();
+                }
+            } catch (error) {
+                console.error('Failed to load product details:', error);
+            }
+        }
+
+        // Update an existing product
+        async function updateProduct() {
+            const form = document.getElementById('editProductForm');
+
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const productId = document.getElementById('editProductId').value;
+            const productData = {
+                price: parseInt(document.getElementById('editProductPrice').value),
+                brandId: parseInt(document.getElementById('editProductBrandId').value),
+                categoryId: parseInt(document.getElementById('editProductCategoryId').value),
+            };
+
+            try {
+                const response = await apiRequest(`/api/products/${productId}`, 'PUT', productData);
+                if (response && response.data) {
+                    showAlert('상품이 성공적으로 수정되었습니다.');
+                    loadProducts();
+                    $('#editProductModal').modal('hide');
+                }
+            } catch (error) {
+                console.error('Failed to update product:', error);
+            }
+        }
+
+        // Delete a product
+        async function deleteProduct(id) {
+            if (!confirm('정말로 이 상품을 삭제하시겠습니까?')) {
+                return;
+            }
+
+            try {
+                await apiRequest(`/api/products/${id}`, 'DELETE');
+                showAlert('상품이 성공적으로 삭제되었습니다.');
+                loadProducts();
+            } catch (error) {
+                console.error('Failed to delete product:', error);
+            }
+        }
+    </script>
+</section>
 </body>
 </html>

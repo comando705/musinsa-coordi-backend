@@ -1,6 +1,12 @@
 package com.musinsacoordi.backend.domain.product;
 
+import com.musinsacoordi.backend.common.dto.BaseResponse;
 import com.musinsacoordi.backend.common.dto.ErrorResponseWrappers;
+import com.musinsacoordi.backend.common.dto.ResponseWrappers;
+import com.musinsacoordi.backend.domain.product.dto.BrandLowestTotalPriceDto;
+import com.musinsacoordi.backend.domain.product.dto.CategoryPriceMinMaxDto;
+import com.musinsacoordi.backend.domain.product.dto.CategoryPriceMinMaxKoDto;
+import com.musinsacoordi.backend.domain.product.dto.CategoryPriceRangeDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -10,10 +16,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import com.musinsacoordi.backend.common.dto.BaseResponse;
-import com.musinsacoordi.backend.common.dto.ResponseWrappers;
-import com.musinsacoordi.backend.domain.product.dto.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/products/query")
@@ -62,7 +68,7 @@ public class ProductQueryController {
     }
 
     @Operation(summary = "Category Min/Max Price Brand Query (English) - 구현3",
-               description = "Find brands with the lowest and highest prices for a specified category.")
+            description = "Find brands with the lowest and highest prices for a specified category.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Query successful",
                     content = @Content(schema = @Schema(implementation = ResponseWrappers.CategoryPriceMinMaxWrapper.class))),

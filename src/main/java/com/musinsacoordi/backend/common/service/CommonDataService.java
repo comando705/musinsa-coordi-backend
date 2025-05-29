@@ -7,7 +7,7 @@ import com.musinsacoordi.backend.domain.category.CategoryRepository;
 import com.musinsacoordi.backend.domain.product.Product;
 import com.musinsacoordi.backend.domain.product.ProductRepository;
 import com.musinsacoordi.backend.common.error.BaseException;
-import com.musinsacoordi.backend.common.error.ErrorCode;
+import com.musinsacoordi.backend.common.error.CommonErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,26 +37,44 @@ public class CommonDataService {
         return brandRepository.findAll();
     }
 
-    public Brand findBrand(Long brandId) {
+    /**
+     * 브랜드 조회
+     * @param brandId 브랜드 ID
+     * @return 브랜드 엔티티
+     * @throws BaseException 브랜드가 존재하지 않는 경우
+     */
+    public Brand getBrand(Long brandId) {
         return brandRepository.findById(brandId)
-                .orElseThrow(() -> new BaseException(ErrorCode.ENTITY_NOT_FOUND, "Brand", brandId));
+                .orElseThrow(() -> new BaseException(CommonErrorCode.ENTITY_NOT_FOUND, "Brand", brandId));
     }
 
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();
     }
 
-    public Category findCategory(Long categoryId) {
+    /**
+     * 카테고리 조회
+     * @param categoryId 카테고리 ID
+     * @return 카테고리 엔티티
+     * @throws BaseException 카테고리가 존재하지 않는 경우
+     */
+    public Category getCategory(Long categoryId) {
         return categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new BaseException(ErrorCode.ENTITY_NOT_FOUND, "Category", categoryId));
+                .orElseThrow(() -> new BaseException(CommonErrorCode.ENTITY_NOT_FOUND, "Category", categoryId));
     }
 
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
 
-    public Product findProduct(Long productId) {
+    /**
+     * 상품 조회
+     * @param productId 상품 ID
+     * @return 상품 엔티티
+     * @throws BaseException 상품이 존재하지 않는 경우
+     */
+    public Product getProduct(Long productId) {
         return productRepository.findById(productId)
-                .orElseThrow(() -> new BaseException(ErrorCode.ENTITY_NOT_FOUND, "Product", productId));
+                .orElseThrow(() -> new BaseException(CommonErrorCode.ENTITY_NOT_FOUND, "Product", productId));
     }
 }

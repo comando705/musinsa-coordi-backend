@@ -6,7 +6,7 @@ import lombok.Getter;
 /**
  * 표준 API 응답 형식을 제공하는 클래스
  * 성공 응답과 오류 응답을 일관된 형식으로 처리합니다.
- * 
+ *
  * @param <T> 응답 데이터의 타입
  */
 @Getter
@@ -16,7 +16,7 @@ public class BaseResponse<T> {
 
     /**
      * 성공 응답을 위한 생성자
-     * 
+     *
      * @param data 응답 데이터
      */
     public BaseResponse(T data) {
@@ -26,7 +26,7 @@ public class BaseResponse<T> {
 
     /**
      * 오류 응답을 위한 생성자
-     * 
+     *
      * @param data 응답 데이터 (일반적으로 null)
      * @param error 오류 상세 정보
      */
@@ -37,7 +37,7 @@ public class BaseResponse<T> {
 
     /**
      * 데이터와 함께 성공 응답을 생성하는 정적 메소드
-     * 
+     *
      * @param data 응답 데이터
      * @return 성공 응답 객체
      */
@@ -47,7 +47,7 @@ public class BaseResponse<T> {
 
     /**
      * 에러 응답을 생성하는 정적 메소드
-     * 
+     *
      * @param errorCode 에러 코드
      * @param message 사용자 정의 에러 메시지 (null인 경우 errorCode의 기본 메시지 사용)
      * @return 에러 응답 객체
@@ -63,7 +63,7 @@ public class BaseResponse<T> {
 
     /**
      * 에러 코드만 사용하는 경우의 에러 응답 생성 메소드
-     * 
+     *
      * @param errorCode 에러 코드
      * @return 에러 응답 객체
      */
@@ -82,7 +82,7 @@ public class BaseResponse<T> {
 
         /**
          * 에러 상세 정보 생성자
-         * 
+         *
          * @param status HTTP 상태 코드
          * @param code 에러 코드 문자열
          * @param message 에러 메시지

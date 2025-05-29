@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" 
+<html xmlns:th="http://www.thymeleaf.org"
       th:replace="~{layout :: html(~{::title}, ~{::section})}">
 <head>
     <title>카테고리 관리 - 무신사 코디 관리자</title>
@@ -92,14 +92,14 @@
         <script th:inline="javascript">
             document.addEventListener('DOMContentLoaded', function() {
                 loadCategories();
-                
+
                 // Create category button click handler
                 document.getElementById('createCategoryButton').addEventListener('click', createCategory);
-                
+
                 // Update category button click handler
                 document.getElementById('updateCategoryButton').addEventListener('click', updateCategory);
             });
-            
+
             // Load all categories
             async function loadCategories() {
                 try {
@@ -111,19 +111,19 @@
                     console.error('Failed to load categories:', error);
                 }
             }
-            
+
             // Display categories in the table
             function displayCategories(categories) {
                 const tableBody = document.getElementById('categoryTableBody');
                 tableBody.innerHTML = '';
-                
+
                 if (categories.length === 0) {
                     const row = document.createElement('tr');
                     row.innerHTML = '<td colspan="4" class="text-center">등록된 카테고리가 없습니다.</td>';
                     tableBody.appendChild(row);
                     return;
                 }
-                
+
                 categories.forEach(category => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
@@ -141,20 +141,20 @@
                     tableBody.appendChild(row);
                 });
             }
-            
+
             // Create a new category
             async function createCategory() {
                 const form = document.getElementById('createCategoryForm');
-                
+
                 if (!form.checkValidity()) {
                     form.reportValidity();
                     return;
                 }
-                
+
                 const categoryData = {
                     name: document.getElementById('createCategoryName').value
                 };
-                
+
                 try {
                     const response = await apiRequest('/api/categories', 'POST', categoryData);
                     if (response && response.data) {
@@ -166,7 +166,7 @@
                     console.error('Failed to create category:', error);
                 }
             }
-            
+
             // Open edit category modal with category data
             function openEditCategoryModal(id, name) {
                 document.getElementById('editCategoryId').value = id;
@@ -175,21 +175,21 @@
                 const editModal = new bootstrap.Modal(document.getElementById('editCategoryModal'));
                 editModal.show();
             }
-            
+
             // Update an existing category
             async function updateCategory() {
                 const form = document.getElementById('editCategoryForm');
-                
+
                 if (!form.checkValidity()) {
                     form.reportValidity();
                     return;
                 }
-                
+
                 const categoryId = document.getElementById('editCategoryId').value;
                 const categoryData = {
                     name: document.getElementById('editCategoryName').value
                 };
-                
+
                 try {
                     const response = await apiRequest(`/api/categories/${categoryId}`, 'PUT', categoryData);
                     if (response && response.data) {
@@ -201,13 +201,13 @@
                     console.error('Failed to update category:', error);
                 }
             }
-            
+
             // Delete a category
             async function deleteCategory(id) {
                 if (!confirm('정말로 이 카테고리를 삭제하시겠습니까?')) {
                     return;
                 }
-                
+
                 try {
                     await apiRequest(`/api/categories/${id}`, 'DELETE');
                     showAlert('카테고리가 성공적으로 삭제되었습니다.');

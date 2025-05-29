@@ -3,9 +3,6 @@ package com.musinsacoordi.backend.common.error;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.http.ResponseEntity;
-
-import java.util.List;
 
 @Getter
 @Schema(description = "ERROR 공통 응답")

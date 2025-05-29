@@ -1,132 +1,133 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" 
-      th:replace="~{layout :: html(~{::title}, ~{::section})}">
+<html th:replace="~{layout :: html(~{::title}, ~{::section})}"
+      xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>브랜드 관리 - 무신사 코디 관리자</title>
 </head>
 <body>
-    <section th:fragment="content">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>브랜드 관리</h2>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createBrandModal">
-                <i class="bi bi-plus-circle"></i> 브랜드 등록
-            </button>
+<section th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>브랜드 관리</h2>
+        <button class="btn btn-primary" data-bs-target="#createBrandModal" data-bs-toggle="modal" type="button">
+            <i class="bi bi-plus-circle"></i> 브랜드 등록
+        </button>
+    </div>
+
+    <!-- Alert Container -->
+    <div id="alertContainer"></div>
+
+    <!-- Loading Spinner -->
+    <div class="spinner-container">
+        <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">Loading...</span>
         </div>
+    </div>
 
-        <!-- Alert Container -->
-        <div id="alertContainer"></div>
+    <!-- Brands Table -->
+    <div class="table-container">
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>브랜드명</th>
+                <th>관리</th>
+            </tr>
+            </thead>
+            <tbody id="brandTableBody">
+            <!-- Table rows will be populated by JavaScript -->
+            </tbody>
+        </table>
+    </div>
 
-        <!-- Loading Spinner -->
-        <div class="spinner-container">
-            <div class="spinner-border text-light" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-        </div>
-
-        <!-- Brands Table -->
-        <div class="table-container">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>브랜드명</th>
-                        <th>관리</th>
-                    </tr>
-                </thead>
-                <tbody id="brandTableBody">
-                    <!-- Table rows will be populated by JavaScript -->
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Create Brand Modal -->
-        <div class="modal fade" id="createBrandModal" tabindex="-1" aria-labelledby="createBrandModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="createBrandModalLabel">브랜드 등록</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="createBrandForm">
-                            <div class="mb-3">
-                                <label for="createBrandName" class="form-label required-field">브랜드명</label>
-                                <input type="text" class="form-control" id="createBrandName" name="name" required>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                        <button type="button" class="btn btn-primary" id="createBrandButton">등록</button>
-                    </div>
+    <!-- Create Brand Modal -->
+    <div aria-hidden="true" aria-labelledby="createBrandModalLabel" class="modal fade" id="createBrandModal"
+         tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createBrandModalLabel">브랜드 등록</h5>
+                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createBrandForm">
+                        <div class="mb-3">
+                            <label class="form-label required-field" for="createBrandName">브랜드명</label>
+                            <input class="form-control" id="createBrandName" name="name" required type="text">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">취소</button>
+                    <button class="btn btn-primary" id="createBrandButton" type="button">등록</button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Edit Brand Modal -->
-        <div class="modal fade" id="editBrandModal" tabindex="-1" aria-labelledby="editBrandModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editBrandModalLabel">브랜드 수정</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="editBrandForm">
-                            <input type="hidden" id="editBrandId">
-                            <div class="mb-3">
-                                <label for="editBrandName" class="form-label required-field">브랜드명</label>
-                                <input type="text" class="form-control" id="editBrandName" name="name" required>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                        <button type="button" class="btn btn-primary" id="updateBrandButton">저장</button>
-                    </div>
+    <!-- Edit Brand Modal -->
+    <div aria-hidden="true" aria-labelledby="editBrandModalLabel" class="modal fade" id="editBrandModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editBrandModalLabel">브랜드 수정</h5>
+                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editBrandForm">
+                        <input id="editBrandId" type="hidden">
+                        <div class="mb-3">
+                            <label class="form-label required-field" for="editBrandName">브랜드명</label>
+                            <input class="form-control" id="editBrandName" name="name" required type="text">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">취소</button>
+                    <button class="btn btn-primary" id="updateBrandButton" type="button">저장</button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Brand-specific JavaScript -->
-        <script th:inline="javascript">
-            document.addEventListener('DOMContentLoaded', function() {
-                loadBrands();
-                
-                // Create brand button click handler
-                document.getElementById('createBrandButton').addEventListener('click', createBrand);
-                
-                // Update brand button click handler
-                document.getElementById('updateBrandButton').addEventListener('click', updateBrand);
-            });
-            
-            // Load all brands
-            async function loadBrands() {
-                try {
-                    const response = await apiRequest('/api/brands');
-                    if (response && response.data) {
-                        displayBrands(response.data);
-                    }
-                } catch (error) {
-                    console.error('Failed to load brands:', error);
+    <!-- Brand-specific JavaScript -->
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            loadBrands();
+
+            // Create brand button click handler
+            document.getElementById('createBrandButton').addEventListener('click', createBrand);
+
+            // Update brand button click handler
+            document.getElementById('updateBrandButton').addEventListener('click', updateBrand);
+        });
+
+        // Load all brands
+        async function loadBrands() {
+            try {
+                const response = await apiRequest('/api/brands');
+                if (response && response.data) {
+                    displayBrands(response.data);
                 }
+            } catch (error) {
+                console.error('Failed to load brands:', error);
             }
-            
-            // Display brands in the table
-            function displayBrands(brands) {
-                const tableBody = document.getElementById('brandTableBody');
-                tableBody.innerHTML = '';
-                
-                if (brands.length === 0) {
-                    const row = document.createElement('tr');
-                    row.innerHTML = '<td colspan="5" class="text-center">등록된 브랜드가 없습니다.</td>';
-                    tableBody.appendChild(row);
-                    return;
-                }
-                
-                brands.forEach(brand => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
+        }
+
+        // Display brands in the table
+        function displayBrands(brands) {
+            const tableBody = document.getElementById('brandTableBody');
+            tableBody.innerHTML = '';
+
+            if (brands.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="5" class="text-center">등록된 브랜드가 없습니다.</td>';
+                tableBody.appendChild(row);
+                return;
+            }
+
+            brands.forEach(brand => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
                         <td>${brand.id}</td>
                         <td>${brand.name}</td>
                         <td>
@@ -138,85 +139,85 @@
                             </button>
                         </td>
                     `;
-                    tableBody.appendChild(row);
-                });
-            }
-            
-            // Create a new brand
-            async function createBrand() {
-                const form = document.getElementById('createBrandForm');
-                
-                if (!form.checkValidity()) {
-                    form.reportValidity();
-                    return;
-                }
-                
-                const brandData = {
-                    name: document.getElementById('createBrandName').value
-                };
-                
-                try {
-                    const response = await apiRequest('/api/brands', 'POST', brandData);
-                    if (response && response.data) {
-                        showAlert('브랜드가 성공적으로 등록되었습니다.');
-                        loadBrands();
-                        $('#createBrandModal').modal('hide');
-                    }
-                } catch (error) {
-                    console.error('Failed to create brand:', error);
-                }
-            }
-            
-            // Open edit brand modal with brand data
-            function openEditBrandModal(id, name) {
-                document.getElementById('editBrandId').value = id;
-                document.getElementById('editBrandName').value = name;
+                tableBody.appendChild(row);
+            });
+        }
 
-                const editModal = new bootstrap.Modal(document.getElementById('editBrandModal'));
-                editModal.show();
+        // Create a new brand
+        async function createBrand() {
+            const form = document.getElementById('createBrandForm');
+
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
             }
-            
-            // Update an existing brand
-            async function updateBrand() {
-                const form = document.getElementById('editBrandForm');
-                
-                if (!form.checkValidity()) {
-                    form.reportValidity();
-                    return;
-                }
-                
-                const brandId = document.getElementById('editBrandId').value;
-                const brandData = {
-                    name: document.getElementById('editBrandName').value
-                };
-                
-                try {
-                    const response = await apiRequest(`/api/brands/${brandId}`, 'PUT', brandData);
-                    if (response && response.data) {
-                        showAlert('브랜드가 성공적으로 수정되었습니다.');
-                        loadBrands();
-                        $('#editBrandModal').modal('hide');
-                    }
-                } catch (error) {
-                    console.error('Failed to update brand:', error);
-                }
-            }
-            
-            // Delete a brand
-            async function deleteBrand(id) {
-                if (!confirm('정말로 이 브랜드를 삭제하시겠습니까?')) {
-                    return;
-                }
-                
-                try {
-                    await apiRequest(`/api/brands/${id}`, 'DELETE');
-                    showAlert('브랜드가 성공적으로 삭제되었습니다.');
+
+            const brandData = {
+                name: document.getElementById('createBrandName').value
+            };
+
+            try {
+                const response = await apiRequest('/api/brands', 'POST', brandData);
+                if (response && response.data) {
+                    showAlert('브랜드가 성공적으로 등록되었습니다.');
                     loadBrands();
-                } catch (error) {
-                    console.error('Failed to delete brand:', error);
+                    $('#createBrandModal').modal('hide');
                 }
+            } catch (error) {
+                console.error('Failed to create brand:', error);
             }
-        </script>
-    </section>
+        }
+
+        // Open edit brand modal with brand data
+        function openEditBrandModal(id, name) {
+            document.getElementById('editBrandId').value = id;
+            document.getElementById('editBrandName').value = name;
+
+            const editModal = new bootstrap.Modal(document.getElementById('editBrandModal'));
+            editModal.show();
+        }
+
+        // Update an existing brand
+        async function updateBrand() {
+            const form = document.getElementById('editBrandForm');
+
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const brandId = document.getElementById('editBrandId').value;
+            const brandData = {
+                name: document.getElementById('editBrandName').value
+            };
+
+            try {
+                const response = await apiRequest(`/api/brands/${brandId}`, 'PUT', brandData);
+                if (response && response.data) {
+                    showAlert('브랜드가 성공적으로 수정되었습니다.');
+                    loadBrands();
+                    $('#editBrandModal').modal('hide');
+                }
+            } catch (error) {
+                console.error('Failed to update brand:', error);
+            }
+        }
+
+        // Delete a brand
+        async function deleteBrand(id) {
+            if (!confirm('정말로 이 브랜드를 삭제하시겠습니까?')) {
+                return;
+            }
+
+            try {
+                await apiRequest(`/api/brands/${id}`, 'DELETE');
+                showAlert('브랜드가 성공적으로 삭제되었습니다.');
+                loadBrands();
+            } catch (error) {
+                console.error('Failed to delete brand:', error);
+            }
+        }
+    </script>
+</section>
 </body>
 </html>

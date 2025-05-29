@@ -1,83 +1,66 @@
 package com.musinsacoordi.backend.domain.brand;
 
+import com.musinsacoordi.backend.domain.brand.dto.BrandRequestDto;
+import com.musinsacoordi.backend.domain.brand.dto.BrandResponseDto;
+import com.musinsacoordi.backend.domain.brand.error.BrandErrorCode;
+import com.musinsacoordi.backend.domain.brand.error.BrandException;
+import com.musinsacoordi.backend.domain.brand.validation.BrandValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.musinsacoordi.backend.common.error.BaseException;
-import com.musinsacoordi.backend.common.error.ErrorCode;
-import com.musinsacoordi.backend.domain.brand.dto.BrandRequestDto;
-import com.musinsacoordi.backend.domain.brand.dto.BrandResponseDto;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class BrandService {
-
     private final BrandRepository brandRepository;
+    private final BrandValidator brandValidator;
 
-    /**
-     * 브랜드 생성
-     */
     @Transactional
     public BrandResponseDto createBrand(BrandRequestDto requestDto) {
-        // 이름 중복 검사
-        if (brandRepository.findByName(requestDto.getName()).isPresent()) {
-            throw new BaseException(ErrorCode.ALREADY_EXIST_ENTITY, "브랜드", requestDto.getName());
-        }
-        
-        Brand brand = requestDto.toEntity();
+        // 비즈니스 규칙 검증
+        brandValidator.validateCreate(requestDto);
+
+        // 엔티티 생성 및 저장
+        Brand brand = Brand.builder()
+                .name(requestDto.getName())
+                .build();
+
         Brand savedBrand = brandRepository.save(brand);
         return BrandResponseDto.of(savedBrand);
     }
 
-    /**
-     * 브랜드 전체 조회
-     */
     public List<BrandResponseDto> getAllBrands() {
         return brandRepository.findAll().stream()
                 .map(BrandResponseDto::of)
-                .collect(Collectors.toList());
+                .toList();
     }
 
-    /**
-     * 브랜드 단일 조회
-     */
     public BrandResponseDto getBrandById(Long id) {
         Brand brand = brandRepository.findById(id)
-                .orElseThrow(() -> new BaseException(ErrorCode.ENTITY_NOT_FOUND, "브랜드", id));
+                .orElseThrow(() -> new BrandException(BrandErrorCode.BRAND_NOT_FOUND, id));
         return BrandResponseDto.of(brand);
     }
 
-    /**
-     * 브랜드 수정
-     */
     @Transactional
     public BrandResponseDto updateBrand(Long id, BrandRequestDto requestDto) {
+        // 비즈니스 규칙 검증
+        brandValidator.validateUpdate(id, requestDto);
+
+        // 엔티티 조회 및 수정
         Brand brand = brandRepository.findById(id)
-                .orElseThrow(() -> new BaseException(ErrorCode.ENTITY_NOT_FOUND, "브랜드", id));
-        
-        // 이름 중복 검사 (자기 자신 제외)
-        brandRepository.findByName(requestDto.getName())
-                .ifPresent(existingBrand -> {
-                    if (!existingBrand.getId().equals(id)) {
-                        throw new BaseException(ErrorCode.ALREADY_EXIST_ENTITY, "브랜드", requestDto.getName());
-                    }
-                });
-        
+                .orElseThrow(() -> new BrandException(BrandErrorCode.BRAND_NOT_FOUND, id));
+
         brand.updateName(requestDto.getName());
         return BrandResponseDto.of(brand);
     }
 
-    /**
-     * 브랜드 삭제
-     */
     @Transactional
     public void deleteBrand(Long id) {
         Brand brand = brandRepository.findById(id)
-                .orElseThrow(() -> new BaseException(ErrorCode.ENTITY_NOT_FOUND, "브랜드", id));
+                .orElseThrow(() -> new BrandException(BrandErrorCode.BRAND_NOT_FOUND, id));
         brandRepository.delete(brand);
     }
 }

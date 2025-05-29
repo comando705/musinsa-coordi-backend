@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.musinsacoordi.backend.common.error.BaseException;
-import com.musinsacoordi.backend.common.error.ErrorCode;
+import com.musinsacoordi.backend.common.error.CommonErrorCode;
 import com.musinsacoordi.backend.domain.brand.Brand;
 import com.musinsacoordi.backend.domain.brand.BrandRepository;
 import com.musinsacoordi.backend.domain.category.Category;
@@ -13,11 +13,6 @@ import com.musinsacoordi.backend.domain.product.dto.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import lombok.Getter;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +28,6 @@ public class ProductQueryService {
      */
     public BrandLowestTotalPriceDto findBrandWithLowestTotalPrice() {
         List<Brand> brands = brandRepository.findAll();
-        List<Category> categories = categoryRepository.findAll();
 
         Brand lowestTotalPriceBrand = null;
         int lowestTotalPrice = Integer.MAX_VALUE;
@@ -79,7 +73,7 @@ public class ProductQueryService {
                                 .filter(p -> p.getCategory().getId().equals(category.getId()))
                                 .min(Comparator.comparing(Product::getPrice)
                                 .thenComparing((Product p) -> p.getBrand().getId(), Comparator.reverseOrder()))
-                        .orElseThrow(() -> new BaseException(ErrorCode.ENTITY_NOT_FOUND,
+                        .orElseThrow(() -> new BaseException(CommonErrorCode.ENTITY_NOT_FOUND,
                                 "카테고리 " + category.getName() + "의 상품", ""))
         ));
 
@@ -94,8 +88,7 @@ public class ProductQueryService {
                         .brandName(lowestProduct.getBrand().getName())
                         .price(lowestProduct.getPrice())
                         .build();
-            })
-            .collect(Collectors.toList());
+            }).toList();
 
         // 전체 카테고리 최저가 합계 계산
         int totalPrice = categoryLowestPrices.stream()
@@ -116,14 +109,14 @@ public class ProductQueryService {
     public CategoryPriceMinMaxDto findMinMaxPriceByCategoryName(String categoryName) {
         // 카테고리 이름으로 카테고리 조회
         Category category = findCategoryByNameOrThrow(categoryName);
-        
+
         // 해당 카테고리의 모든 상품 조회
         List<Product> categoryProducts = findProductsByCategoryOrThrow(category, categoryName);
-        
+
         // 최저가/최고가 상품 찾기
         Product lowestPriceProduct = findProductWithExtremePrice(categoryProducts, categoryName, true);
         Product highestPriceProduct = findProductWithExtremePrice(categoryProducts, categoryName, false);
-        
+
         // DTO 생성 및 반환
         return buildCategoryPriceMinMaxDto(
                 category.getName(),
@@ -134,14 +127,14 @@ public class ProductQueryService {
 
     private Category findCategoryByNameOrThrow(String categoryName) {
         return categoryRepository.findByName(categoryName)
-                .orElseThrow(() -> new BaseException(ErrorCode.ENTITY_NOT_FOUND, 
+                .orElseThrow(() -> new BaseException(CommonErrorCode.ENTITY_NOT_FOUND,
                         "카테고리 " + categoryName, ""));
     }
 
     private List<Product> findProductsByCategoryOrThrow(Category category, String categoryName) {
         List<Product> products = productRepository.findByCategory(category);
         if (products.isEmpty()) {
-            throw new BaseException(ErrorCode.ENTITY_NOT_FOUND, 
+            throw new BaseException(CommonErrorCode.ENTITY_NOT_FOUND,
                 "카테고리 " + categoryName + "의 상품", "");
         }
         return products;
@@ -149,16 +142,16 @@ public class ProductQueryService {
 
     private Product findProductWithExtremePrice(List<Product> products, String categoryName, boolean findLowest) {
         Comparator<Product> priceComparator = Comparator.comparing(Product::getPrice);
-        
+
         if (!findLowest) {
             priceComparator = priceComparator.reversed();
         }
-        
+
         String extremeType = findLowest ? "최저가" : "최고가";
-        
+
         return products.stream()
                 .min(priceComparator)
-                .orElseThrow(() -> new BaseException(ErrorCode.ENTITY_NOT_FOUND, 
+                .orElseThrow(() -> new BaseException(CommonErrorCode.ENTITY_NOT_FOUND,
                     "카테고리 " + categoryName + "의 " + extremeType + " 상품", ""));
     }
 
@@ -170,10 +163,10 @@ public class ProductQueryService {
     }
 
     private CategoryPriceMinMaxDto buildCategoryPriceMinMaxDto(
-        String categoryName, 
+        String categoryName,
         CategoryPriceMinMaxDto.BrandPriceDto lowestPriceDto,
         CategoryPriceMinMaxDto.BrandPriceDto highestPriceDto) {
-        
+
         return CategoryPriceMinMaxDto.builder()
                 .category(categoryName)
                 .lowestPrice(Collections.singletonList(lowestPriceDto))

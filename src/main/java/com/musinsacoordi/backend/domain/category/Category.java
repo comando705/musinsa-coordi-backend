@@ -1,12 +1,12 @@
 package com.musinsacoordi.backend.domain.category;
 
+import com.musinsacoordi.backend.common.entity.BaseTimeEntity;
+import com.musinsacoordi.backend.domain.product.Product;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import com.musinsacoordi.backend.common.entity.BaseTimeEntity;
-import com.musinsacoordi.backend.domain.product.Product;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,11 +22,15 @@ public class Category extends BaseTimeEntity {
     @Column(nullable = false, unique = true, length = 50)
     private String name;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-    private List<Product> products = new ArrayList<>();
+    @Version
+    private Long version;
+
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<Product> products = new ArrayList<>();
 
     @Builder
-    public Category(String name) {
+    public Category(Long id, String name) {
+        this.id = id;
         this.name = name;
     }
 

@@ -1,13 +1,13 @@
 package com.musinsacoordi.backend.domain.product;
 
+import com.musinsacoordi.backend.common.entity.BaseTimeEntity;
+import com.musinsacoordi.backend.domain.brand.Brand;
+import com.musinsacoordi.backend.domain.category.Category;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import com.musinsacoordi.backend.common.entity.BaseTimeEntity;
-import com.musinsacoordi.backend.domain.brand.Brand;
-import com.musinsacoordi.backend.domain.category.Category;
 
 @Entity
 @Getter
@@ -32,7 +32,14 @@ public class Product extends BaseTimeEntity {
     private Integer price;
 
     @Builder
-    public Product(Brand brand, Category category, Integer price) {
+    public Product(Long id, Brand brand, Category category, Integer price) {
+        this.id = id;
+        this.brand = brand;
+        this.category = category;
+        this.price = price;
+    }
+
+    public void update(Brand brand, Category category, Integer price) {
         this.brand = brand;
         this.category = category;
         this.price = price;
