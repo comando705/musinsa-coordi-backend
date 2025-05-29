@@ -27,23 +27,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
-/**
- * ProductService 테스트
- *
- * 설계 방향 및 원칙:
- * - 서비스 계층의 단위 테스트
- * - 외부 의존성(Repository)은 Mocking하여 격리된 테스트 수행
- * - 비즈니스 로직 검증에 집중
- *
- * 기술적 고려사항:
- * - MockitoExtension을 사용한 Mocking
- * - 각 메서드별 성공/실패 케이스 검증
- * - 예외 처리 검증
- *
- * 사용 시 고려사항:
- * - 실제 DB 연동 없이 Mocking된 Repository로 테스트
- * - 각 비즈니스 로직별 성공/실패 케이스 검증
- */
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
 

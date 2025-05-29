@@ -35,8 +35,6 @@ public class BrandControllerIntegrationTest {
     // 각 테스트 실행 전 데이터 초기화 또는 설정
     @BeforeEach
     void setUp() {
-        // 데이터베이스 초기화 (data.sql에 의해 이미 초기 데이터가 삽입되지만, 테스트 간 독립성을 위해 추가 초기화 가능)
-        // 여기서는 @Transactional 덕분에 롤백되므로 별도의 초기화는 필요 없음
     }
 
     // 각 테스트 실행 후 데이터 정리

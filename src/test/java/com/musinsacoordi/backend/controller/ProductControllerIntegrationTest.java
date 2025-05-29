@@ -25,23 +25,6 @@ import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/**
- * ProductController 테스트
- *
- * 설계 방향 및 원칙:
- * - 컨트롤러 계층의 통합 테스트
- * - 서비스 계층은 Mocking하여 격리된 테스트 수행
- * - HTTP 요청/응답에 대한 검증에 집중
- *
- * 기술적 고려사항:
- * - SpringBootTest를 사용하여 전체 애플리케이션 컨텍스트 로드
- * - MockMvc를 통한 HTTP 요청 테스트
- * - ObjectMapper를 통한 JSON 변환
- *
- * 사용 시 고려사항:
- * - 실제 DB 연동 없이 Mocking된 서비스로 테스트
- * - 각 엔드포인트별 성공/실패 케이스 검증
- */
 @SpringBootTest
 @AutoConfigureMockMvc
 class ProductControllerIntegrationTest {

@@ -16,7 +16,7 @@ import java.util.List;
 
 @Tag(name = "카테고리 API", description = "카테고리 관련 API")
 @RestController
-@RequestMapping("/api/v1/categories")
+@RequestMapping("/api/categories")
 @RequiredArgsConstructor
 public class CategoryController {
 
@@ -30,7 +30,7 @@ public class CategoryController {
     ) {
         CategoryResponseDto responseDto = categoryService.createCategory(requestDto);
         return ResponseEntity
-                .created(URI.create("/api/v1/categories/" + responseDto.getId()))
+                .created(URI.create("/api/categories/" + responseDto.getId()))
                 .body(BaseResponse.success(responseDto));
     }
 

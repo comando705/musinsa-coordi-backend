@@ -79,17 +79,8 @@ public class CategoryService {
     @Transactional
     public void deleteCategory(Long id) {
         Category category = categoryRepository.findById(id)
-                .map(this::lockCategory)
                 .orElseThrow(() -> new BaseException(CommonErrorCode.ENTITY_NOT_FOUND, "카테고리", id));
 
         categoryRepository.delete(category);
-    }
-
-    private Category lockCategory(Category category) {
-        // 연관된 상품들에 대한 비관적 락 획득
-        List<Product> products = productRepository.findByCategoryWithPessimisticLock(category);
-        category.getProducts().clear();
-        category.getProducts().addAll(products);
-        return category;
     }
 }

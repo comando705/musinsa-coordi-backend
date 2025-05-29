@@ -54,7 +54,7 @@ class CategoryControllerIntegrationTest {
                 .name("NewTestCategory")
                 .build();
 
-        mockMvc.perform(post("/api/v1/categories")
+        mockMvc.perform(post("/api/categories")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isCreated())
@@ -68,7 +68,7 @@ class CategoryControllerIntegrationTest {
                 .name("UpdatedCategoryName")
                 .build();
 
-        mockMvc.perform(put("/api/v1/categories/" + testCategoryId)
+        mockMvc.perform(put("/api/categories/" + testCategoryId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateDto)))
                 .andExpect(status().isOk())
@@ -79,11 +79,11 @@ class CategoryControllerIntegrationTest {
     @DisplayName("모든 카테고리를 성공적으로 조회한다")
     void getCategories_Success() throws Exception {
         // data.sql에 의해 기본 카테고리가 존재한다고 가정
-        mockMvc.perform(get("/api/v1/categories") //
+        mockMvc.perform(get("/api/categories")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk()) // HTTP 200 OK 확인
-                .andExpect(jsonPath("$.data").isArray()) //
-                .andExpect(jsonPath("$.data.length()").isNotEmpty()); //
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data").isArray())
+                .andExpect(jsonPath("$.data.length()").isNotEmpty());
     }
 
     @Test
@@ -91,14 +91,14 @@ class CategoryControllerIntegrationTest {
     void getCategory_Success() throws Exception {
         // 테스트용 카테고리 생성 (데이터베이스에 미리 저장)
         CategoryRequestDto createDto = CategoryRequestDto.builder().name("UniqueCategory").build();
-        mockMvc.perform(post("/api/v1/categories") //
+        mockMvc.perform(post("/api/categories")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(createDto)));
 
-        mockMvc.perform(get("/api/v1/categories/1") // // data.sql에 의해 id 1은 이미 존재할 가능성 높음
+        mockMvc.perform(get("/api/categories/1")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk()) // HTTP 200 OK 확인
-                .andExpect(jsonPath("$.data.id").isNumber()); //
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.id").isNumber());
     }
 
     @Test
@@ -106,11 +106,11 @@ class CategoryControllerIntegrationTest {
     void deleteCategory_Success() throws Exception {
         // 테스트용 카테고리 생성
         CategoryRequestDto createDto = CategoryRequestDto.builder().name("DeleteCategory").build();
-        mockMvc.perform(post("/api/v1/categories") //
+        mockMvc.perform(post("/api/categories") //
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(createDto)));
 
-        mockMvc.perform(delete("/api/v1/categories/1") // // data.sql에 의해 id 1은 이미 존재할 가능성 높음
+        mockMvc.perform(delete("/api/categories/1") // // data.sql에 의해 id 1은 이미 존재할 가능성 높음
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent()); // HTTP 204 No Content 확인
     }
