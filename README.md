@@ -37,7 +37,7 @@
 ```bash
 # 실행
 ./gradlew bootRun
-
+```
 
 ### 2.4 테스트 실행
 ```bash
@@ -59,7 +59,7 @@
 - H2 Console: `http://localhost:8080/h2-console`
 - JDBC URL: `jdbc:h2:mem:testdb`
 - Username: `comando705`
-- Password: `123qwe!@#` 데이터베이스
+- Password: `123qwe!@#`
 
 ### 3.3 개발 가이드
 - 코드 스타일: Google Java Style Guide 준수
