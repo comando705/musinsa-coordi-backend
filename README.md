@@ -18,6 +18,55 @@
 - Spring Boot DevTools
 - OpenAPI 3.0 (Swagger)
 
+### 1.3 프로젝트 구조
+```
+com.musinsacoordi.backend
+├── domain/           # 도메인 계층
+│   ├── brand/        # 브랜드 도메인
+│   │   ├── dto/      
+│   │   │   ├── BrandRequestDto.java    # 브랜드 요청 DTO
+│   │   │   └── BrandResponseDto.java   # 브랜드 응답 DTO
+│   │   ├── error/    # 도메인별 에러 처리
+│   │   ├── validation/# 유효성 검증
+│   │   ├── Brand.java          # 브랜드 엔티티
+│   │   ├── BrandController.java # 브랜드 API 컨트롤러
+│   │   ├── BrandService.java    # 브랜드 비즈니스 로직
+│   │   └── BrandRepository.java # 브랜드 데이터 접근
+│   ├── product/      # 상품 도메인
+│   └── category/     # 카테고리 도메인
+├── web/              # 웹 페이지 컨트롤러
+│   └── WebController.java
+├── common/           # 공통 모듈
+├── config/           # 설정 클래스
+└── MusinsaCoordiBackendApplication.java
+```
+
+각 패키지 및 클래스 설명:
+
+1. **domain/**: 도메인 중심 패키지
+   - 각 도메인별로 독립적인 패키지 구성
+   - 도메인 패키지 구조 예시 (brand 도메인):
+     - `dto/`: 요청/응답 데이터 객체
+     - `error/`: 도메인별 예외 처리
+     - `validation/`: 입력값 검증
+     - `Entity.java`: 도메인 엔티티
+     - `Controller.java`: REST API 엔드포인트
+     - `Service.java`: 비즈니스 로직
+     - `Repository.java`: 데이터 접근 계층
+
+2. **web/**: 웹 페이지 라우팅
+   - `WebController.java`: 웹 페이지 요청 처리
+
+3. **common/**: 공통 기능
+   - 공통 유틸리티
+   - 공통 예외 처리
+   - 공통 응답 형식
+
+4. **config/**: 애플리케이션 설정
+   - Spring Boot 설정 클래스
+
+5. **MusinsaCoordiBackendApplication.java**: 스프링 부트 메인 클래스
+
 ## 2. 빌드 및 실행 방법
 
 ### 2.1 개발 환경 요구사항
@@ -73,39 +122,52 @@
 
 ### 3.5 상세 패키지 구조
 ```
-com.musinsacoordi
-├── common/
-│   ├── annotation/        # 커스텀 어노테이션
-│   ├── config/           # 공통 설정
-│   │   ├── SwaggerConfig.java
-│   │   ├── WebConfig.java
-│   │   └── SecurityConfig.java
-│   ├── util/            # 유틸리티 클래스
-│   │   ├── DateUtils.java
-│   │   └── StringUtils.java
-│   └── constant/        # 상수 정의
-│       └── CommonConstant.java
-├── domain/
-│   ├── entity/          # 도메인 엔티티
-│   │   └── BaseEntity.java  # 공통 엔티티 속성
-│   └── enums/           # 도메인 관련 열거형
-├── global/
-│   ├── error/           # 에러 처리
-│   │   ├── GlobalExceptionHandler.java
-│   │   ├── ErrorCode.java
-│   │   ├── ErrorResponse.java
-│   │   └── BusinessException.java
-│   └── response/        # 공통 응답 형식
-│       ├── ApiResponse.java
-│       └── ResponseCode.java
-└── api/                # API 관련 패키지
-    ├── controller/     # REST 컨트롤러
-    ├── service/        # 비즈니스 로직
-    ├── repository/     # 데이터 접근 계층
-    └── dto/            # DTO 클래스
-        ├── request/    # 요청 DTO
-        └── response/   # 응답 DTO
+com.musinsacoordi.backend
+├── domain/           # 도메인 계층
+│   ├── brand/        # 브랜드 도메인
+│   │   ├── dto/      
+│   │   │   ├── BrandRequestDto.java    # 브랜드 요청 DTO
+│   │   │   └── BrandResponseDto.java   # 브랜드 응답 DTO
+│   │   ├── error/    # 도메인별 에러 처리
+│   │   ├── validation/# 유효성 검증
+│   │   ├── Brand.java          # 브랜드 엔티티
+│   │   ├── BrandController.java # 브랜드 API 컨트롤러
+│   │   ├── BrandService.java    # 브랜드 비즈니스 로직
+│   │   └── BrandRepository.java # 브랜드 데이터 접근
+│   ├── product/      # 상품 도메인
+│   └── category/     # 카테고리 도메인
+├── web/              # 웹 페이지 컨트롤러
+│   └── WebController.java
+├── common/           # 공통 모듈
+├── config/           # 설정 클래스
+└── MusinsaCoordiBackendApplication.java
 ```
+
+각 패키지 및 클래스 설명:
+
+1. **domain/**: 도메인 중심 패키지
+   - 각 도메인별로 독립적인 패키지 구성
+   - 도메인 패키지 구조 예시 (brand 도메인):
+     - `dto/`: 요청/응답 데이터 객체
+     - `error/`: 도메인별 예외 처리
+     - `validation/`: 입력값 검증
+     - `Entity.java`: 도메인 엔티티
+     - `Controller.java`: REST API 엔드포인트
+     - `Service.java`: 비즈니스 로직
+     - `Repository.java`: 데이터 접근 계층
+
+2. **web/**: 웹 페이지 라우팅
+   - `WebController.java`: 웹 페이지 요청 처리
+
+3. **common/**: 공통 기능
+   - 공통 유틸리티
+   - 공통 예외 처리
+   - 공통 응답 형식
+
+4. **config/**: 애플리케이션 설정
+   - Spring Boot 설정 클래스
+
+5. **MusinsaCoordiBackendApplication.java**: 스프링 부트 메인 클래스
 
 ### 3.6 공통 파일 구성
 1. **BaseEntity**: 모든 엔티티가 상속받는 기본 클래스
