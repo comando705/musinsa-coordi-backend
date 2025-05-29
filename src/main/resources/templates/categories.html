@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      th:replace="~{layout :: html(~{::title}, ~{::section})}">
+<head>
+    <title>카테고리 관리 - 무신사 코디 관리자</title>
+</head>
+<body>
+    <section th:fragment="content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>카테고리 관리</h2>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCategoryModal">
+                <i class="bi bi-plus-circle"></i> 카테고리 등록
+            </button>
+        </div>
+
+        <!-- Alert Container -->
+        <div id="alertContainer"></div>
+
+        <!-- Loading Spinner -->
+        <div class="spinner-container">
+            <div class="spinner-border text-light" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+
+        <!-- Categories Table -->
+        <div class="table-container">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>카테고리명</th>
+                        <th>관리</th>
+                    </tr>
+                </thead>
+                <tbody id="categoryTableBody">
+                    <!-- Table rows will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Create Category Modal -->
+        <div class="modal fade" id="createCategoryModal" tabindex="-1" aria-labelledby="createCategoryModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="createCategoryModalLabel">카테고리 등록</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="createCategoryForm">
+                            <div class="mb-3">
+                                <label for="createCategoryName" class="form-label required-field">카테고리명</label>
+                                <input type="text" class="form-control" id="createCategoryName" name="name" required>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                        <button type="button" class="btn btn-primary" id="createCategoryButton">등록</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Category Modal -->
+        <div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editCategoryModalLabel">카테고리 수정</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editCategoryForm">
+                            <input type="hidden" id="editCategoryId">
+                            <div class="mb-3">
+                                <label for="editCategoryName" class="form-label required-field">카테고리명</label>
+                                <input type="text" class="form-control" id="editCategoryName" name="name" required>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                        <button type="button" class="btn btn-primary" id="updateCategoryButton">저장</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category-specific JavaScript -->
+        <script th:inline="javascript">
+            document.addEventListener('DOMContentLoaded', function() {
+                loadCategories();
+                
+                // Create category button click handler
+                document.getElementById('createCategoryButton').addEventListener('click', createCategory);
+                
+                // Update category button click handler
+                document.getElementById('updateCategoryButton').addEventListener('click', updateCategory);
+            });
+            
+            // Load all categories
+            async function loadCategories() {
+                try {
+                    const response = await apiRequest('/api/categories');
+                    if (response && response.data) {
+                        displayCategories(response.data);
+                    }
+                } catch (error) {
+                    console.error('Failed to load categories:', error);
+                }
+            }
+            
+            // Display categories in the table
+            function displayCategories(categories) {
+                const tableBody = document.getElementById('categoryTableBody');
+                tableBody.innerHTML = '';
+                
+                if (categories.length === 0) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = '<td colspan="4" class="text-center">등록된 카테고리가 없습니다.</td>';
+                    tableBody.appendChild(row);
+                    return;
+                }
+                
+                categories.forEach(category => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${category.id}</td>
+                        <td>${category.name}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary btn-action" onclick="openEditCategoryModal(${category.id}, '${category.name}')">
+                                <i class="bi bi-pencil"></i> 수정
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger btn-action" onclick="deleteCategory(${category.id})">
+                                <i class="bi bi-trash"></i> 삭제
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+            
+            // Create a new category
+            async function createCategory() {
+                const form = document.getElementById('createCategoryForm');
+                
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+                
+                const categoryData = {
+                    name: document.getElementById('createCategoryName').value
+                };
+                
+                try {
+                    const response = await apiRequest('/api/categories', 'POST', categoryData);
+                    if (response && response.data) {
+                        showAlert('카테고리가 성공적으로 등록되었습니다.');
+                        loadCategories();
+                        $('#createCategoryModal').modal('hide');
+                    }
+                } catch (error) {
+                    console.error('Failed to create category:', error);
+                }
+            }
+            
+            // Open edit category modal with category data
+            function openEditCategoryModal(id, name) {
+                document.getElementById('editCategoryId').value = id;
+                document.getElementById('editCategoryName').value = name;
+
+                const editModal = new bootstrap.Modal(document.getElementById('editCategoryModal'));
+                editModal.show();
+            }
+            
+            // Update an existing category
+            async function updateCategory() {
+                const form = document.getElementById('editCategoryForm');
+                
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+                
+                const categoryId = document.getElementById('editCategoryId').value;
+                const categoryData = {
+                    name: document.getElementById('editCategoryName').value
+                };
+                
+                try {
+                    const response = await apiRequest(`/api/categories/${categoryId}`, 'PUT', categoryData);
+                    if (response && response.data) {
+                        showAlert('카테고리가 성공적으로 수정되었습니다.');
+                        loadCategories();
+                        $('#editCategoryModal').modal('hide');
+                    }
+                } catch (error) {
+                    console.error('Failed to update category:', error);
+                }
+            }
+            
+            // Delete a category
+            async function deleteCategory(id) {
+                if (!confirm('정말로 이 카테고리를 삭제하시겠습니까?')) {
+                    return;
+                }
+                
+                try {
+                    await apiRequest(`/api/categories/${id}`, 'DELETE');
+                    showAlert('카테고리가 성공적으로 삭제되었습니다.');
+                    loadCategories();
+                } catch (error) {
+                    console.error('Failed to delete category:', error);
+                }
+            }
+        </script>
+    </section>
+</body>
+</html>
